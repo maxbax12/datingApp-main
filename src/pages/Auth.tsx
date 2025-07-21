@@ -110,7 +110,7 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
               className="mx-auto mb-4"
             >
               <img 
-                src="/src/assets/img/wingmatch.png" 
+                src="/wingmatch.png" 
                 alt="WingMatch" 
                 className="h-20 w-auto mx-auto"
               />

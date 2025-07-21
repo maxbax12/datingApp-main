@@ -15,7 +15,7 @@ const NotFound = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50">
       <div className="text-center">
         <img 
-          src="/src/assets/img/wingmatch.png" 
+          src="/wingmatch.png" 
           alt="WingMatch" 
           className="h-16 w-auto mx-auto mb-6"
         />

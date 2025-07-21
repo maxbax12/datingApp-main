@@ -38,7 +38,7 @@ const PageHeader = ({ title, showSettingsButton = true, rightElement, isMainTitl
       {isMainTitle ? (
         <div className="flex items-center space-x-2 overflow-hidden">
           <img 
-            src="/src/assets/img/wingmatch.png" 
+            src="/wingmatch.png" 
             alt="WingMatch" 
             className="h-20 w-auto"
           />
