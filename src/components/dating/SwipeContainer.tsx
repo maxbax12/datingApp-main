@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, X, RotateCcw } from "lucide-react";
+import { Heart, X, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 import ProfileCard, { Profile } from "./ProfileCard";
 import { Button } from "@/components/ui/button";
 import MatchModal from "./MatchModal";
@@ -79,10 +79,21 @@ const SwipeContainer = () => {
   const [matches, setMatches] = useState<Profile[]>([]);
   const [showMatchModal, setShowMatchModal] = useState(false);
   const [newMatch, setNewMatch] = useState<Profile | null>(null);
+  const [showSwipeHints, setShowSwipeHints] = useState(true);
 
   const currentProfile = profiles[currentIndex];
 
+  // Debug logging
+  console.log("Current profile:", currentProfile);
+  console.log("Current index:", currentIndex);
+  console.log("Total profiles:", profiles.length);
+
   const handleSwipe = (direction: "left" | "right") => {
+    // Hide hints after first swipe
+    if (showSwipeHints) {
+      setShowSwipeHints(false);
+    }
+
     // In this AI-powered app, swipes train the algorithm rather than create matches
     console.log(`AI Learning: Swiped ${direction} on ${currentProfile.name}`);
 
@@ -138,35 +149,98 @@ const SwipeContainer = () => {
   }
 
   return (
-    <div className="flex-1 relative" style={{ bottom: "50px" }}>
+    <div className="absolute inset-0">
       {/* Card Stack */}
-      <div
-        className="absolute left-0 right-0"
-        style={{ bottom: "0px", top: "40px" }}
-      >
-        <AnimatePresence>
-          {profiles
-            .slice(currentIndex, currentIndex + 3)
-            .map((profile, index) => (
-              <ProfileCard
-                key={profile.id}
-                profile={profile}
-                onSwipe={handleSwipe}
-                isTop={index === 0}
-                style={{
-                  zIndex: 10 - index,
-                  transform: `scale(${1 - index * 0.02}) translateY(${index * 4}px)`,
-                }}
-              />
-            ))}
-        </AnimatePresence>
+      <div className="absolute inset-4 bottom-32">
+        <div className="relative w-full h-full max-w-sm mx-auto">
+          <AnimatePresence>
+            {profiles
+              .slice(currentIndex, currentIndex + 3)
+              .map((profile, index) => (
+                <motion.div
+                  key={profile.id}
+                  className="absolute inset-0 cursor-grab active:cursor-grabbing"
+                  style={{
+                    zIndex: 10 - index,
+                    transform: `scale(${1 - index * 0.02}) translateY(${index * 4}px)`,
+                  }}
+                  drag={index === 0} // Only allow dragging the top card
+                  dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                  onDragEnd={(_, info) => {
+                    if (index === 0) { // Only handle swipes for the top card
+                      const swipeThreshold = 100;
+                      if (Math.abs(info.offset.x) > swipeThreshold) {
+                        handleSwipe(info.offset.x > 0 ? "right" : "left");
+                      }
+                    }
+                  }}
+                  whileDrag={{ rotate: 5, scale: 1.02 }}
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{
+                    x: 300,
+                    opacity: 0,
+                    transition: { duration: 0.3 },
+                  }}
+                >
+                  <ProfileCard
+                    profile={profile}
+                    onSwipe={handleSwipe}
+                    isTop={index === 0}
+                  />
+                </motion.div>
+              ))}
+          </AnimatePresence>
+        </div>
       </div>
 
+      {/* Swipe Hints */}
+      {showSwipeHints && (
+        <div className="absolute inset-0 pointer-events-none z-30">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute left-8 top-1/2 transform -translate-y-1/2 flex flex-col items-center"
+          >
+            <motion.div
+              animate={{ x: [-10, 0, -10] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="bg-red-500 text-white p-3 rounded-full shadow-lg"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </motion.div>
+            <span className="text-red-600 font-semibold mt-2 text-sm">Pass</span>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute right-8 top-1/2 transform -translate-y-1/2 flex flex-col items-center"
+          >
+            <motion.div
+              animate={{ x: [10, 0, 10] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="bg-green-500 text-white p-3 rounded-full shadow-lg"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </motion.div>
+            <span className="text-green-600 font-semibold mt-2 text-sm">Like</span>
+          </motion.div>
+          
+          <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 text-center">
+            <motion.p
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-gray-600 font-medium text-sm bg-white/90 px-4 py-2 rounded-full shadow-md"
+            >
+              Swipe or tap buttons to start
+            </motion.p>
+          </div>
+        </div>
+      )}
+
       {/* Action Buttons */}
-      <div
-        className="absolute bottom-8 flex space-x-6 z-20"
-        style={{ left: "60%", transform: "translateX(-50%)" }}
-      >
+      <div className="absolute bottom-16 lg:bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-6 z-30">
         <Button
           onClick={() => handleSwipe("left")}
           variant="outline"

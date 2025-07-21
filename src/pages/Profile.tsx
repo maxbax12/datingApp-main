@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Edit3,
   Camera,
@@ -6,19 +6,21 @@ import {
   Briefcase,
   GraduationCap,
   Heart,
-  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PhotoUpload } from "@/components/ui/photo-upload";
 import Navigation from "@/components/dating/Navigation";
+import PageHeader from "@/components/dating/PageHeader";
+import ResponsiveContainer from "@/components/layout/ResponsiveContainer";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
-
-  // Mock user data
-  const user = {
+  const { user: authUser, updateUser } = useAuth();
+  const [userProfile, setUserProfile] = useState({
     name: "Alex",
     age: 25,
     photos: [
@@ -36,66 +38,118 @@ const Profile = () => {
       matches: 89,
       conversations: 34,
     },
+  });
+
+  // Load profile data from localStorage or auth context
+  useEffect(() => {
+    const savedProfile = localStorage.getItem("wingmatch_profile");
+    console.log("Loading saved profile:", savedProfile);
+    if (savedProfile) {
+      const profileData = JSON.parse(savedProfile);
+      console.log("Parsed profile data:", profileData);
+      
+      // Calculate age from dateOfBirth if available
+      const calculateAge = (dateOfBirth: string) => {
+        if (!dateOfBirth) return 25;
+        const today = new Date();
+        const birthDate = new Date(dateOfBirth);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        return age;
+      };
+
+      setUserProfile(prev => ({
+        ...prev,
+        name: authUser?.firstName || prev.name,
+        age: profileData.dateOfBirth ? calculateAge(profileData.dateOfBirth) : prev.age,
+        photos: profileData.photos?.length > 0 ? profileData.photos : prev.photos,
+        bio: profileData.bio || prev.bio,
+        occupation: profileData.occupation || prev.occupation,
+        education: profileData.education || prev.education,
+        location: profileData.location || prev.location,
+        interests: profileData.interests?.length > 0 ? profileData.interests : prev.interests,
+      }));
+    } else if (authUser) {
+      setUserProfile(prev => ({
+        ...prev,
+        name: authUser.firstName,
+      }));
+    }
+  }, [authUser]);
+
+  const saveProfile = () => {
+    // Save the profile in both formats for compatibility
+    const profileForStorage = {
+      photos: userProfile.photos,
+      bio: userProfile.bio,
+      occupation: userProfile.occupation,
+      education: userProfile.education,
+      location: userProfile.location,
+      interests: userProfile.interests,
+      // Keep the original onboarding format structure
+      dateOfBirth: "", // Could be calculated back from age if needed
+      height: "",
+      lookingFor: "",
+      relationshipGoals: "",
+    };
+    
+    localStorage.setItem("wingmatch_profile", JSON.stringify(profileForStorage));
+    console.log("Saved profile:", profileForStorage);
+    setIsEditing(false);
+  };
+
+  const updateProfile = (field: string, value: any) => {
+    setUserProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto pb-safe-or-4">
+    <ResponsiveContainer className="bg-gray-50 pb-safe-or-4">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            if (window.confirm("Are you sure you want to sign out?")) {
-              localStorage.clear();
-              window.location.reload();
-            }
-          }}
-          className="text-gray-600 hover:text-red-600"
-        >
-          <LogOut className="h-4 w-4" />
-        </Button>
-
-        <h1 className="text-xl font-bold text-gray-900">My Profile</h1>
-
-        <Button
-          onClick={() => setIsEditing(!isEditing)}
-          variant="outline"
-          size="sm"
-        >
-          <Edit3 className="h-4 w-4 mr-2" />
-          {isEditing ? "Save" : "Edit"}
-        </Button>
-      </header>
+      <PageHeader 
+        title="My Profile"
+        rightElement={
+          <Button
+            onClick={() => setIsEditing(!isEditing)}
+            variant="outline"
+            size="sm"
+          >
+            <Edit3 className="h-4 w-4 mr-2" />
+            {isEditing ? "Save" : "Edit"}
+          </Button>
+        }
+      />
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* Photo Section */}
         <Card>
           <CardContent className="p-4">
-            <div className="grid grid-cols-3 gap-2">
-              {user.photos.map((photo, index) => (
-                <div
-                  key={index}
-                  className="aspect-square rounded-lg overflow-hidden relative group"
-                >
-                  <img
-                    src={photo}
-                    alt={`Profile photo ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  {isEditing && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Camera className="h-6 w-6 text-white" />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            {isEditing && (
-              <Button variant="outline" className="w-full mt-3">
-                <Camera className="h-4 w-4 mr-2" />
-                Add Photos
-              </Button>
+            {isEditing ? (
+              <PhotoUpload
+                photos={userProfile.photos}
+                onChange={(photos) => updateProfile("photos", photos)}
+                maxPhotos={6}
+              />
+            ) : (
+              <div className="grid grid-cols-3 gap-2">
+                {userProfile.photos.map((photo, index) => (
+                  <div
+                    key={index}
+                    className="aspect-square rounded-lg overflow-hidden relative group"
+                  >
+                    <img
+                      src={photo}
+                      alt={`Profile photo ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -108,16 +162,16 @@ const Profile = () => {
           <CardContent className="space-y-4">
             <div className="flex items-center space-x-3">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={user.photos[0]} alt={user.name} />
-                <AvatarFallback>{user.name[0]}</AvatarFallback>
+                <AvatarImage src={userProfile.photos[0]} alt={userProfile.name} />
+                <AvatarFallback>{userProfile.name[0]}</AvatarFallback>
               </Avatar>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">
-                  {user.name}, {user.age}
+                  {userProfile.name}, {userProfile.age}
                 </h2>
                 <div className="flex items-center text-gray-600 text-sm">
                   <MapPin className="h-4 w-4 mr-1" />
-                  {user.location}
+                  {userProfile.location}
                 </div>
               </div>
             </div>
@@ -125,11 +179,11 @@ const Profile = () => {
             <div className="space-y-2">
               <div className="flex items-center text-gray-700">
                 <Briefcase className="h-4 w-4 mr-3 text-gray-400" />
-                <span>{user.occupation}</span>
+                <span>{userProfile.occupation}</span>
               </div>
               <div className="flex items-center text-gray-700">
                 <GraduationCap className="h-4 w-4 mr-3 text-gray-400" />
-                <span>{user.education}</span>
+                <span>{userProfile.education}</span>
               </div>
             </div>
           </CardContent>
@@ -141,7 +195,7 @@ const Profile = () => {
             <CardTitle className="text-lg">About Me</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 leading-relaxed">{user.bio}</p>
+            <p className="text-gray-700 leading-relaxed">{userProfile.bio}</p>
           </CardContent>
         </Card>
 
@@ -152,7 +206,7 @@ const Profile = () => {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {user.interests.map((interest) => (
+              {userProfile.interests.map((interest) => (
                 <Badge key={interest} variant="secondary" className="text-sm">
                   {interest}
                 </Badge>
@@ -170,19 +224,19 @@ const Profile = () => {
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold text-pink-500">
-                  {user.stats.likes}
+                  {userProfile.stats.likes}
                 </div>
                 <div className="text-sm text-gray-600">Likes</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-purple-500">
-                  {user.stats.matches}
+                  {userProfile.stats.matches}
                 </div>
                 <div className="text-sm text-gray-600">Matches</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-blue-500">
-                  {user.stats.conversations}
+                  {userProfile.stats.conversations}
                 </div>
                 <div className="text-sm text-gray-600">Chats</div>
               </div>
@@ -203,7 +257,7 @@ const Profile = () => {
       </div>
 
       <Navigation />
-    </div>
+    </ResponsiveContainer>
   );
 };
 

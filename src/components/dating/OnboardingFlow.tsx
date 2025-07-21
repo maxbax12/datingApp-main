@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PhotoUpload } from "@/components/ui/photo-upload";
 import AIProfileSetup from "./AIProfileSetup";
 
 interface OnboardingFlowProps {
@@ -98,6 +99,8 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep((prev) => prev + 1);
     } else if (currentStep === totalSteps - 1) {
+      // Save profile data before moving to AI setup
+      localStorage.setItem("wingmatch_profile", JSON.stringify(profileData));
       setShowAISetup(true);
     }
   };
@@ -160,56 +163,11 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              {[...Array(6)].map((_, index) => (
-                <div
-                  key={index}
-                  className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-pink-400 transition-colors cursor-pointer"
-                >
-                  {profileData.photos[index] ? (
-                    <img
-                      src={profileData.photos[index]}
-                      alt={`Photo ${index + 1}`}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      {index === 0 ? (
-                        <Camera className="h-6 w-6 text-gray-400 mx-auto mb-1" />
-                      ) : (
-                        <Upload className="h-6 w-6 text-gray-400 mx-auto mb-1" />
-                      )}
-                      <span className="text-xs text-gray-500">
-                        {index === 0 ? "Main photo" : "Add photo"}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <Button
-              onClick={() => {
-                // Simulate photo upload with mock photos
-                const mockPhotos = [
-                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
-                  "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=400&h=400&fit=crop&crop=face",
-                  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
-                ];
-                updateProfile("photos", mockPhotos);
-              }}
-              variant="outline"
-              className="w-full"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              📸 Add Demo Photos
-            </Button>
-
-            {profileData.photos.length > 0 && (
-              <div className="text-center text-sm text-green-600 mt-2">
-                ✅ {profileData.photos.length} photos added!
-              </div>
-            )}
+            <PhotoUpload
+              photos={profileData.photos}
+              onChange={(photos) => updateProfile("photos", photos)}
+              maxPhotos={6}
+            />
           </div>
         );
 

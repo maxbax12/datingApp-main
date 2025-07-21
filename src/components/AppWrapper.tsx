@@ -51,7 +51,7 @@ const AppWrapper = ({ children }: AppWrapperProps) => {
             <Heart className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent mb-2">
-            LoveSync
+            WingMatch
           </h1>
           <div className="flex items-center justify-center space-x-2 text-gray-600">
             <Loader2 className="h-4 w-4 animate-spin" />

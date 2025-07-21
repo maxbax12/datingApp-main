@@ -50,7 +50,7 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
         aiSetupCompleted: mode === "login",
       };
 
-      localStorage.setItem("lovesync_user", JSON.stringify(mockUser));
+      localStorage.setItem("wingmatch_user", JSON.stringify(mockUser));
       onAuthSuccess();
     }, 1000);
   };
@@ -71,7 +71,7 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
         aiSetupCompleted: true,
       };
 
-      localStorage.setItem("lovesync_user", JSON.stringify(mockUser));
+      localStorage.setItem("wingmatch_user", JSON.stringify(mockUser));
       onAuthSuccess();
     }, 800);
   };
@@ -109,13 +109,12 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
               transition={{ delay: 0.2, type: "spring" }}
               className="mx-auto mb-4"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-                <Heart className="h-8 w-8 text-white" />
-              </div>
+              <img 
+                src="/src/assets/img/wingmatch.png" 
+                alt="WingMatch" 
+                className="h-20 w-auto mx-auto"
+              />
             </motion.div>
-            <CardTitle className="text-2xl bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              LoveSync
-            </CardTitle>
             <p className="text-gray-600 text-sm">
               {mode === "login"
                 ? "Welcome back to AI-powered dating"
@@ -383,11 +382,11 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
             </div>
 
             {mode === "login" && (
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-3">
                 <a href="#" className="text-sm text-pink-500 hover:underline">
                   Forgot your password?
                 </a>
-                <div className="pt-2">
+                <div className="pt-2 space-y-2">
                   <Button
                     onClick={() => {
                       setIsLoading(true);
@@ -396,13 +395,13 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
                           id: "demo_user_123",
                           firstName: "Demo",
                           lastName: "User",
-                          email: "demo@lovesync.app",
+                          email: "demo@wingmatch.app",
                           phone: "+1-555-DEMO",
                           profileCompleted: true,
                           aiSetupCompleted: true,
                         };
                         localStorage.setItem(
-                          "lovesync_user",
+                          "wingmatch_user",
                           JSON.stringify(mockUser),
                         );
                         setIsLoading(false);
@@ -410,10 +409,37 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
                       }, 500);
                     }}
                     variant="ghost"
-                    className="text-xs text-gray-500 hover:text-gray-700"
+                    className="w-full text-xs text-gray-500 hover:text-gray-700 border border-gray-200"
                     disabled={isLoading}
                   >
-                    🚀 Quick Demo Login
+                    🚀 Quick Demo Login (Skip Setup)
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setIsLoading(true);
+                      setTimeout(() => {
+                        const mockUser = {
+                          id: "new_user_" + Date.now(),
+                          firstName: "New",
+                          lastName: "User",
+                          email: "newuser@wingmatch.app",
+                          phone: "+1-555-NEW",
+                          profileCompleted: false,
+                          aiSetupCompleted: false,
+                        };
+                        localStorage.setItem(
+                          "wingmatch_user",
+                          JSON.stringify(mockUser),
+                        );
+                        setIsLoading(false);
+                        onAuthSuccess();
+                      }, 500);
+                    }}
+                    variant="outline"
+                    className="w-full text-xs text-purple-600 border-purple-200 hover:bg-purple-50"
+                    disabled={isLoading}
+                  >
+                    🎯 Try Full Experience (With Setup)
                   </Button>
                 </div>
               </div>

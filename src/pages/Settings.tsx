@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/dating/Navigation";
+import ResponsiveContainer from "@/components/layout/ResponsiveContainer";
 
 const Settings = () => {
   const [notifications, setNotifications] = useState({
@@ -72,7 +73,7 @@ const Settings = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col max-w-md mx-auto pb-safe-or-4">
+    <ResponsiveContainer className="bg-gray-50 pb-safe-or-4">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 p-4">
         <h1 className="text-xl font-bold text-gray-900">Settings</h1>
@@ -93,7 +94,7 @@ const Settings = () => {
               />
               <SettingCard
                 icon={CreditCard}
-                title="LoveSync Premium"
+                title="WingMatch Premium"
                 description="Unlock exclusive features"
                 badge="Upgrade"
               />
@@ -318,7 +319,7 @@ const Settings = () => {
               onClick={() => {
                 if (window.confirm("Reset to onboarding flow?")) {
                   const currentUser = JSON.parse(
-                    localStorage.getItem("lovesync_user") || "{}",
+                    localStorage.getItem("wingmatch_user") || "{}",
                   );
                   const resetUser = {
                     ...currentUser,
@@ -326,7 +327,7 @@ const Settings = () => {
                     aiSetupCompleted: false,
                   };
                   localStorage.setItem(
-                    "lovesync_user",
+                    "wingmatch_user",
                     JSON.stringify(resetUser),
                   );
                   window.location.reload();
@@ -342,14 +343,14 @@ const Settings = () => {
               onClick={() => {
                 if (window.confirm("Reset AI setup only?")) {
                   const currentUser = JSON.parse(
-                    localStorage.getItem("lovesync_user") || "{}",
+                    localStorage.getItem("wingmatch_user") || "{}",
                   );
                   const resetUser = {
                     ...currentUser,
                     aiSetupCompleted: false,
                   };
                   localStorage.setItem(
-                    "lovesync_user",
+                    "wingmatch_user",
                     JSON.stringify(resetUser),
                   );
                   window.location.reload();
@@ -378,7 +379,7 @@ const Settings = () => {
       </div>
 
       <Navigation />
-    </div>
+    </ResponsiveContainer>
   );
 };
 

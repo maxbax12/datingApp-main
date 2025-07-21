@@ -1,50 +1,32 @@
 import { useState } from "react";
-import { LogOut, Settings } from "lucide-react";
 import SwipeContainer from "@/components/dating/SwipeContainer";
 import Navigation from "@/components/dating/Navigation";
-import { Button } from "@/components/ui/button";
+import PageHeader from "@/components/dating/PageHeader";
+import ResponsiveContainer from "@/components/layout/ResponsiveContainer";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
-  const handleLogout = () => {
-    if (window.confirm("Are you sure you want to sign out?")) {
-      localStorage.clear();
-      window.location.reload();
-    }
-  };
+  const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex flex-col max-w-md mx-auto pb-safe-or-4">
+    <ResponsiveContainer className={cn(
+      "bg-gradient-to-br from-pink-50 to-purple-50",
+      isMobile ? "pb-safe-or-4" : "pb-16"
+    )}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleLogout}
-          className="text-gray-600 hover:text-red-600"
-        >
-          <LogOut className="h-4 w-4" />
-        </Button>
-
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-          LoveSync
-        </h1>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => (window.location.href = "/settings")}
-          className="text-gray-600 hover:text-gray-800"
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
-      </header>
+      <div className="bg-white border-b border-gray-200">
+        <PageHeader title="WingMatch" isMainTitle={true} />
+      </div>
 
       {/* Main Content - Swipe Area */}
-      <SwipeContainer />
+      <div className="flex-1 relative min-h-0 w-full">
+        <SwipeContainer />
+      </div>
 
       {/* Bottom Navigation */}
       <Navigation />
-    </div>
+    </ResponsiveContainer>
   );
 };
 

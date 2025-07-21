@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import PageHeader from "@/components/dating/PageHeader";
 
 interface Match {
   id: string;
@@ -73,8 +74,9 @@ const ChatList = ({ onChatSelect }: ChatListProps) => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
+      <PageHeader title="Messages" />
+      
       <div className="p-4 border-b border-gray-200 bg-white">
-        <h1 className="text-xl font-bold text-gray-900 mb-2">Messages</h1>
         <div className="flex items-center space-x-2">
           <Badge variant="secondary" className="bg-pink-100 text-pink-700">
             {mockMatches.filter((m) => m.unreadCount > 0).length} new

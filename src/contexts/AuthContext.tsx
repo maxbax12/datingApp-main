@@ -40,13 +40,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     // Check for existing session
     const checkAuthStatus = async () => {
       try {
-        const savedUser = localStorage.getItem("lovesync_user");
+        const savedUser = localStorage.getItem("wingmatch_user");
         if (savedUser) {
           setUser(JSON.parse(savedUser));
         }
       } catch (error) {
         console.error("Error checking auth status:", error);
-        localStorage.removeItem("lovesync_user");
+        localStorage.removeItem("wingmatch_user");
       } finally {
         setIsLoading(false);
       }
@@ -62,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Check if user already exists in localStorage
-      const existingUser = localStorage.getItem("lovesync_user");
+      const existingUser = localStorage.getItem("wingmatch_user");
       if (existingUser) {
         const user = JSON.parse(existingUser);
         setUser(user);
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       };
 
       setUser(mockUser);
-      localStorage.setItem("lovesync_user", JSON.stringify(mockUser));
+      localStorage.setItem("wingmatch_user", JSON.stringify(mockUser));
     } catch (error) {
       throw new Error("Login failed");
     } finally {
@@ -104,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       };
 
       setUser(newUser);
-      localStorage.setItem("lovesync_user", JSON.stringify(newUser));
+      localStorage.setItem("wingmatch_user", JSON.stringify(newUser));
     } catch (error) {
       throw new Error("Signup failed");
     } finally {
@@ -114,14 +114,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("lovesync_user");
+    localStorage.removeItem("wingmatch_user");
   };
 
   const updateUser = (updates: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
-      localStorage.setItem("lovesync_user", JSON.stringify(updatedUser));
+      localStorage.setItem("wingmatch_user", JSON.stringify(updatedUser));
     }
   };
 

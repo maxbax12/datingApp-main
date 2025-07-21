@@ -34,13 +34,7 @@ const ProfileCard = ({
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showAIButton, setShowAIButton] = useState(false);
 
-  const handleDragEnd = (event: any, info: any) => {
-    const swipeThreshold = 100;
-
-    if (Math.abs(info.offset.x) > swipeThreshold) {
-      onSwipe(info.offset.x > 0 ? "right" : "left");
-    }
-  };
+  // Drag functionality moved to SwipeContainer for better UX
 
   const nextPhoto = () => {
     setCurrentPhotoIndex((prev) =>
@@ -55,22 +49,11 @@ const ProfileCard = ({
   };
 
   return (
-    <motion.div
-      className="absolute inset-4 bg-white rounded-xl shadow-lg overflow-hidden cursor-grab active:cursor-grabbing"
+    <div
+      className="w-full h-full bg-white rounded-xl shadow-lg overflow-hidden"
       style={style}
-      drag={isTop}
-      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      onDragEnd={handleDragEnd}
-      whileDrag={{ rotate: 5, scale: 1.02 }}
-      initial={{ scale: 0.95, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{
-        x: 300,
-        opacity: 0,
-        transition: { duration: 0.3 },
-      }}
-      onHoverStart={() => setShowAIButton(true)}
-      onHoverEnd={() => setShowAIButton(false)}
+      onMouseEnter={() => setShowAIButton(true)}
+      onMouseLeave={() => setShowAIButton(false)}
     >
       {/* Photo Section */}
       <div className="relative h-2/3">
@@ -184,7 +167,7 @@ const ProfileCard = ({
           PASS
         </motion.div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 };
 

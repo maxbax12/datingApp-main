@@ -1,10 +1,13 @@
 import { useState } from "react";
 import ChatList from "@/components/dating/ChatList";
 import Navigation from "@/components/dating/Navigation";
+import ResponsiveContainer from "@/components/layout/ResponsiveContainer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft, Heart, Video, Phone, Send, Smile } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface Match {
   id: string;
@@ -60,6 +63,7 @@ const Matches = () => {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [newMessage, setNewMessage] = useState("");
+  const isMobile = useIsMobile();
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
@@ -86,7 +90,7 @@ const Matches = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col max-w-md mx-auto pb-safe-or-4">
+    <ResponsiveContainer className="bg-white pb-safe-or-4">
       {selectedMatch ? (
         // Chat View
         <div className="flex flex-col h-screen">
@@ -183,12 +187,20 @@ const Matches = () => {
         </div>
       ) : (
         // Matches List View
-        <div className="flex flex-col h-screen">
-          <ChatList onChatSelect={setSelectedMatch} />
-          <Navigation />
+        <div className={cn(
+          "flex h-screen",
+          !isMobile && "max-w-4xl mx-auto"
+        )}>
+          <div className={cn(
+            "flex flex-col",
+            isMobile ? "w-full" : "w-full"
+          )}>
+            <ChatList onChatSelect={setSelectedMatch} />
+            <Navigation />
+          </div>
         </div>
       )}
-    </div>
+    </ResponsiveContainer>
   );
 };
 
